@@ -1,15 +1,8 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useLanguage } from '../LanguageContext'
 
-/*
-  PHOTOS: save your uploaded images to /public/ with these names:
-    /public/img-cozonac.jpg   → photo of Boromir cozonac products
-    /public/img-mezeluri.jpg  → photo of Nobile's meat products
-    /public/img-lactate.jpg   → photo of Hochland / dairy products
-    /public/img-magazin.jpg   → photo of store / wines shelf
-*/
 const imgMap = {
   dulciuri: '/Captura de pantalla 2026-03-22 184503.png',
   mezeluri: '/Captura de pantalla 2026-03-22 184347.png',
@@ -17,7 +10,94 @@ const imgMap = {
   bauturi:  '/Captura de pantalla 2026-03-22 184410.png',
 }
 
+const imgPos = {
+  dulciuri: 'center top',
+  mezeluri: 'center top',
+  lactate:  'left top',
+  bauturi:  'left top',
+}
+
 const ease = [0.16, 1, 0.3, 1]
+
+function ProductCard({ cat, index, inView }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <motion.div
+      className={`pcard${open ? ' pcard--open' : ''}`}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, delay: index * 0.1, ease }}
+    >
+      {/* Gold top border — visible on hover/open */}
+      <div className="pcard__top-line" />
+
+      {/* Photo */}
+      <div className="pcard__img-wrap">
+        <img
+          className="pcard__img"
+          src={imgMap[cat.cls]}
+          alt={cat.name}
+          style={{ objectPosition: imgPos[cat.cls] }}
+        />
+        <div className="pcard__img-vignette" />
+        {/* Category number watermark */}
+        <span className="pcard__watermark">{cat.num}</span>
+      </div>
+
+      {/* Info area */}
+      <div className="pcard__body">
+        <div className="pcard__meta">
+          <span className="pcard__tag">{cat.tag}</span>
+          <span className="pcard__icon">{cat.icon}</span>
+        </div>
+
+        <h3 className="pcard__name">{cat.name}</h3>
+        <p className="pcard__namesub">{cat.nameSub}</p>
+        <p className="pcard__desc">{cat.desc}</p>
+
+        <button
+          className="pcard__toggle"
+          onClick={() => setOpen(v => !v)}
+          aria-expanded={open}
+        >
+          <span>{open ? <X size={14} /> : <ChevronDown size={14} />}</span>
+          {open ? 'Cerrar' : cat.products.split(' · ').length + ' productos'}
+        </button>
+      </div>
+
+      {/* Products panel — slides down */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="pcard__products"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.45, ease }}
+          >
+            <div className="pcard__products-inner">
+              <div className="pcard__products-grid">
+                {cat.productList.map((p, i) => (
+                  <motion.div
+                    key={p}
+                    className="pcard__product-item"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04, duration: 0.3 }}
+                  >
+                    <span className="pcard__product-dot" />
+                    {p}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
 
 export default function Products() {
   const { tr } = useLanguage()
@@ -49,61 +129,13 @@ export default function Products() {
             {tr.products.sub}
           </p>
         </motion.div>
+
+        <div className="products__grid">
+          {tr.products.items.map((cat, i) => (
+            <ProductCard key={cat.num} cat={cat} index={i} inView={inView} />
+          ))}
+        </div>
       </div>
-
-      <div className="products__grid">
-        {tr.products.items.map((cat, i) => (
-          <motion.div
-            key={cat.num}
-            className={`product-card product-card--${cat.cls}`}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={inView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.75, delay: i * 0.1, ease }}
-          >
-            <div className="product-card__line" />
-
-            {/* Real photo background */}
-            <div
-              className="product-card__bg"
-              style={{
-                backgroundImage: `url('${imgMap[cat.cls]}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
-            <div className="product-card__overlay" />
-
-            <span className="product-card__num">{cat.num}</span>
-            <div className="product-card__icon-bg">{cat.icon}</div>
-
-            <div className="product-card__content">
-              <span className="product-card__tag">{cat.tag}</span>
-              <h3 className="product-card__name">
-                {cat.name}
-                <br />
-                <span className="product-card__name-es">{cat.nameSub}</span>
-              </h3>
-              <p style={{
-                fontSize: '0.82rem', color: 'var(--cream-dim)',
-                lineHeight: 1.65, marginTop: 12, opacity: 0.85,
-              }}>
-                {cat.desc}
-              </p>
-              <div className="product-card__count">{cat.products}</div>
-            </div>
-
-            <div className="card-arrow" style={{
-              position: 'absolute', top: 28, right: 28,
-              zIndex: 4, opacity: 0,
-              transition: 'opacity 0.4s',
-            }}>
-              <ArrowUpRight size={20} color="var(--gold)" />
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <style>{`.product-card:hover .card-arrow { opacity: 1 !important; }`}</style>
     </section>
   )
 }
