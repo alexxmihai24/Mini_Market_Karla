@@ -55,7 +55,11 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
+
+/* Remove tap highlight on mobile */
+* { -webkit-tap-highlight-color: transparent; }
 
 body {
   background-color: var(--bg);
@@ -479,11 +483,11 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
    ========================================== */
 .hero {
   position: relative;
-  height: 100svh;
-  min-height: 640px;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   overflow: hidden;
+  padding: 120px 0 80px;
 }
 
 .hero__bg {
@@ -1550,15 +1554,181 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 }
 
 /* ==========================================
-   RESPONSIVE ADJUSTMENTS
+   RESPONSIVE — MOBILE FIRST
+   Breakpoints:
+     xs  → max 480px  (small phones)
+     sm  → max 640px  (phones)
+     md  → max 768px  (large phones / small tablet)
+     lg  → max 900px  (tablet portrait)
+     xl  → max 1100px (tablet landscape / small laptop)
    ========================================== */
-@media (max-width: 640px) {
-  .hero__title-main { font-size: clamp(4rem, 20vw, 6rem); }
-  .hero__actions { flex-direction: column; align-items: flex-start; }
+
+/* ─── XL: tablet landscape / small laptop ─── */
+@media (max-width: 1100px) {
+  :root { --section-py: clamp(60px, 8vw, 100px); }
+
+  .products__grid { grid-template-columns: repeat(2, 1fr); }
+  .pcard__products-grid { grid-template-columns: repeat(3, 1fr); }
+
+  .footer__grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+}
+
+/* ─── LG: tablet portrait ─── */
+@media (max-width: 900px) {
+  :root { --section-py: clamp(56px, 7vw, 90px); }
+
+  /* Hero */
+  .hero { min-height: 100svh; height: auto; padding: 110px 0 80px; }
+  .hero__inner { grid-template-columns: 1fr; gap: 0; }
+  .hero__visual { display: none; }
   .hero__scroll { display: none; }
-  .about__stats { grid-template-columns: 1fr; }
-  .about__stat { border-right: none; border-bottom: 1px solid var(--border-faint); }
-  .about__stat:last-child { border-bottom: none; }
-  .feature-card { border-right: none; border-bottom: 1px solid var(--border-faint); }
+
+  /* Features */
+  .features { padding: 60px 0; }
+  .features__grid { grid-template-columns: 1fr; gap: 0; }
+  .feature-card {
+    border-right: none;
+    border-bottom: 1px solid var(--border-faint);
+    padding: 36px 32px;
+  }
   .feature-card:last-child { border-bottom: none; }
+
+  /* About */
+  .about__inner { grid-template-columns: 1fr; gap: 48px; }
+  .about__visual { display: none; }
+  .about__stats { grid-template-columns: repeat(3, 1fr); }
+
+  /* Gallery spans reset */
+  .gallery__item:nth-child(1) { grid-row: span 1; aspect-ratio: 1; }
+  .gallery__item:nth-child(6) { grid-column: span 1; aspect-ratio: 1; }
+  .gallery__grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Contact */
+  .contact__inner { grid-template-columns: 1fr; gap: 40px; }
+  .contact__map { min-height: 280px; }
+
+  /* Footer */
+  .footer__grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer__brand { grid-column: span 2; }
+}
+
+/* ─── MD: large phones ─── */
+@media (max-width: 768px) {
+  :root {
+    --section-py: clamp(48px, 10vw, 80px);
+    --gutter: 20px;
+  }
+
+  /* Typography */
+  .section-title { font-size: clamp(1.9rem, 7vw, 2.8rem); }
+
+  /* Navbar burger already shown at 768px */
+  .navbar__inner { height: 64px; }
+
+  /* Hero */
+  .hero { padding: 100px 0 70px; }
+  .hero__title-main { font-size: clamp(4.5rem, 18vw, 7rem); }
+  .hero__title-sub { font-size: clamp(1.1rem, 4vw, 1.5rem); }
+  .hero__sub { font-size: 0.92rem; max-width: 100%; }
+  .hero__actions { flex-wrap: wrap; gap: 12px; }
+  .hero__actions .btn { flex: 1; min-width: 140px; justify-content: center; }
+
+  /* Products */
+  .products__grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .products__header { margin-bottom: 40px; }
+  .pcard__products-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Gallery */
+  .gallery__header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .gallery__grid { grid-template-columns: repeat(2, 1fr); gap: 3px; }
+
+  /* About stats row */
+  .about__stats { grid-template-columns: repeat(3, 1fr); }
+
+  /* Contact */
+  .hours-table td { font-size: 0.82rem; padding: 8px 0; }
+
+  /* Footer */
+  .footer__grid { grid-template-columns: 1fr; gap: 28px; }
+  .footer__brand { grid-column: span 1; }
+  .footer__bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .footer { padding: 44px 0 0; }
+}
+
+/* ─── SM: standard phones ─── */
+@media (max-width: 640px) {
+  :root {
+    --section-py: 48px;
+    --gutter: 16px;
+  }
+
+  /* Hero */
+  .hero { padding: 90px 0 60px; min-height: auto; }
+  .hero__title-main { font-size: clamp(3.8rem, 20vw, 6rem); }
+  .hero__eyebrow { font-size: 0.62rem; }
+  .hero__sub { font-size: 0.88rem; line-height: 1.65; }
+  .hero__actions { flex-direction: column; gap: 10px; }
+  .hero__actions .btn { width: 100%; justify-content: center; }
+
+  /* Features */
+  .features { padding: 48px 0; }
+  .feature-card { padding: 28px 24px; }
+  .feature-card__num { font-size: 3rem; top: 16px; right: 20px; }
+
+  /* Products */
+  .products__grid { grid-template-columns: 1fr; gap: 14px; }
+  .pcard__products-grid { grid-template-columns: 1fr 1fr; }
+  .pcard__body { padding: 18px 18px 16px; }
+
+  /* About */
+  .about__stats { grid-template-columns: 1fr; }
+  .about__stat {
+    border-right: none;
+    border-bottom: 1px solid var(--border-faint);
+    padding: 20px 16px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .about__stat:last-child { border-bottom: none; }
+  .about__stat-num { font-size: 2rem; }
+  .about__text p { font-size: 0.92rem; }
+
+  /* Gallery */
+  .gallery__grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery__more { margin-top: 32px; }
+
+  /* Contact */
+  .contact__map { min-height: 240px; }
+  .contact__item { gap: 14px; }
+  .contact__item-icon { width: 38px; height: 38px; flex-shrink: 0; }
+  .contact__info-block { gap: 28px; }
+
+  /* Footer */
+  .footer__flag { margin-bottom: 36px; }
+  .footer__grid { gap: 24px; }
+
+  /* Buttons */
+  .btn { padding: 13px 24px; font-size: 0.8rem; }
+}
+
+/* ─── XS: small phones (iPhone SE, Galaxy A series, etc.) ─── */
+@media (max-width: 400px) {
+  :root { --gutter: 14px; }
+
+  .hero__title-main { font-size: clamp(3.2rem, 22vw, 5rem); }
+  .hero__title-sub { font-size: 1rem; }
+
+  .section-title { font-size: clamp(1.7rem, 8vw, 2.2rem); }
+
+  .products__grid { grid-template-columns: 1fr; }
+  .pcard__products-grid { grid-template-columns: 1fr; }
+
+  .gallery__grid { grid-template-columns: 1fr; }
+
+  .navbar__logo-text { display: none; }
+
+  .footer__grid { gap: 20px; }
+  .footer__copy { font-size: 0.7rem; }
 }
